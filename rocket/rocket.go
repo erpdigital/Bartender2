@@ -273,7 +273,7 @@ log.WithField("message", "Method").Debug("3")
 				log.WithField("message", "Method").Debug("11")
 				log.WithField("message", "Method").Debug(pack["fields"]) 
 				fieldsValue, exists := pack["fields"]
-
+				return
 // Check if it exists and is not nil
 				if !exists || fieldsValue == nil {
    				 log.Warn("fields is nil or does not exist")
