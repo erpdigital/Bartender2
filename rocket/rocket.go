@@ -164,15 +164,18 @@ func (rock *RocketCon) run() {
 	}
 	log.WithField("message", "Method").Debug("ws.close")
 	defer ws.Close()
-	return 
-	log.WithField("message", "Method").Debug("Middlerun")
+	
 	// Configure Websocket using Tunables
 	ws.SetReadLimit(socketreadsizelimit)
 	ws.SetReadDeadline(time.Now().Add(timeout))
+	log.WithField("message", "Method").Debug("BeforePong")
 	ws.SetPongHandler(func(string) error {
 		ws.SetReadDeadline(time.Now().Add(timeout))
 		return nil
 	})
+	log.WithField("message", "Method").Debug("AfterPong")
+	return 
+	
 	tick := time.NewTicker(pingtime)
 	defer tick.Stop()
 
