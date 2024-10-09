@@ -86,8 +86,8 @@ func (rock *RocketCon) handleMessageObject(obj map[string]interface{}) Message {
 			msg.AmIPinged = true
 		}
 	}
-	//msg.IsMention = true
-	//msg.AmIPinged = true
+	msg.IsMention = true
+	msg.AmIPinged = true
 	if _, ok := obj["unread"]; !ok {
 		// Not sure what it was, but currently this key is not part of the map, and there's no repeated messages with
 		// this commented out.
