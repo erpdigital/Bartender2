@@ -225,7 +225,11 @@ func (rock *RocketCon) run() {
 		if msg, ok := pack["msg"]; ok {
 			switch msg {
 			case "connected":
-				rock.session = pack["session"].(string)
+				if session, ok := pack["session"].(string); ok {
+   				 rock.session = session
+						} else {
+							    log.Warn("Session is nil or not a string")
+								}
 			case "result":
 				rock.resultsMutex.RLock()
 				if channel, ok := rock.results[pack["id"].(string)]; ok {
