@@ -96,6 +96,7 @@ func NewConnectionFromConfig(config *config.Config) (*RocketCon, error) {
 }
 
 func (rock *RocketCon) init() error {
+		log.WithField("message", "INit").Debug("I am in init")
 	// Init variables
 	rock.send = make(chan interface{}, 1024)
 	rock.receive = make(chan interface{}, 1024)
