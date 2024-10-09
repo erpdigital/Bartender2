@@ -204,7 +204,7 @@ log.WithField("message", "Method").Debug("Subscription")
 		}
 	}()
 	log.WithField("message", "Method").Debug("ManageResult MAp")
-return 
+//return 
 	// Send Thread
 	go func() {
 		for {
