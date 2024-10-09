@@ -111,7 +111,18 @@ func (rock *RocketCon) init() error {
 	rock.quit = make(chan struct{}, 0)
 	rock.channels = make(map[string]string)
 
-	go rock.run()
+	go func() {
+	  for {
+		// Use defer to recover from any panic in the run method
+		defer func() {
+		if r := recover(); r != nil {
+			log.WithField("error", r).Error("Recovered from panic in run method")
+			}
+		}()
+		rock.run() // Call the run method
+		time.Sleep(2 * time.Second) // Optional: delay before restarting
+		}
+	}()
 
 	// Send Init Messages
 	rock.connect()
