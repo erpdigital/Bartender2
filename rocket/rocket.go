@@ -145,8 +145,9 @@ log.WithField("message", "afterRun").Debug("hello")
 }
 
 func (rock *RocketCon) run() {
-	return 
 	log.WithField("message", "Method").Debug("run")
+	return 
+	
 	// Set some websocket tunables
 	const socketreadsizelimit = 65536
 	const pingtime = 120 * time.Second
