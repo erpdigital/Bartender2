@@ -204,7 +204,7 @@ log.WithField("message", "Method").Debug("Subscription")
 		}
 	}()
 	log.WithField("message", "Method").Debug("ManageResult MAp")
-//return 
+
 	// Send Thread
 	go func() {
 		for {
@@ -217,6 +217,7 @@ log.WithField("message", "Method").Debug("Subscription")
 			}
 		}
 	}()
+log.WithField("message", "Method").Debug("1")
 
 	// Read Thread
 	for {
@@ -227,14 +228,14 @@ log.WithField("message", "Method").Debug("Subscription")
 			log.WithError(err).WithField("ws", ws).Warn("Cannot read websocket.")
 			break
 		}
-
+log.WithField("message", "Method").Debug("2")
 		var pack map[string]interface{}
 		err = json.Unmarshal(raw, &pack)
 		if err != nil {
 			log.WithError(err).WithField("raw", raw).Warn("Cannot unmarshal data read from websocket.")
 			continue
 		}
-
+log.WithField("message", "Method").Debug("3")
 		if msg, ok := pack["msg"]; ok {
 			switch msg {
 			case "connected":
@@ -243,17 +244,23 @@ log.WithField("message", "Method").Debug("Subscription")
 						} else {
 							    log.Warn("Session is nil or not a string")
 								}
+				log.WithField("message", "Method").Debug("4")
 			case "result":
 				rock.resultsMutex.RLock()
 				if channel, ok := rock.results[pack["id"].(string)]; ok {
 					// We want to unlock the resultsMutex before the following blocking operation.
 					rock.resultsMutex.RUnlock()
 					channel <- pack
+					log.WithField("message", "Method").Debug("5")
 				} else {
 					rock.resultsMutex.RUnlock()
+					log.WithField("message", "Method").Debug("6")
 				}
+				log.WithField("message", "Method").Debug("7")
 				rock.resultsDel <- pack["id"].(string)
+				log.WithField("message", "Method").Debug("8")
 			case "added":
+				log.WithField("message", "Method").Debug("9")
 				switch pack["collection"].(string) {
 				case "users":
 					break
@@ -263,6 +270,7 @@ log.WithField("message", "Method").Debug("Subscription")
 			case "updated":
 				break
 			case "changed":
+				log.WithField("message", "Method").Debug("11")
 				obj := pack["fields"].(map[string]interface{})["args"].([]interface{})
 				switch pack["collection"].(string) {
 				case "stream-notify-user":
