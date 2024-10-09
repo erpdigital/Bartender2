@@ -14,7 +14,7 @@ import (
 func main() {
 	log.SetFormatter(&log.TextFormatter{})
 	log.SetLevel(log.InfoLevel)
-
+	log.WithField("message", "MAIN").Debug("I am in MAIN")
 	configFile := os.Getenv("BARTENDER_CONFIG")
 	if len(configFile) == 0 {
 		configFile = "config.yaml"
