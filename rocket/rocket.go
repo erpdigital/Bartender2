@@ -271,7 +271,22 @@ log.WithField("message", "Method").Debug("3")
 				break
 			case "changed":
 				log.WithField("message", "Method").Debug("11")
-				obj := pack["fields"].(map[string]interface{})["args"].([]interface{})
+				fields, ok := pack["fields"].(map[string]interface{})
+				if !ok {
+    					log.Warn("fields is nil or not a map")
+					    return // or handle the error appropriately
+						}
+
+// Check if "args" exists and is a slice
+args, ok := fields["args"].([]interface{})
+if !ok {
+    log.Warn("args is nil or not a slice")
+    return // or handle the error appropriately
+}
+
+// Now you can safely use `args`
+obj := args // Now obj is guaranteed to be a []interface{}
+//				obj := pack["fields"].(map[string]interface{})["args"].([]interface{})
 				switch pack["collection"].(string) {
 				case "stream-notify-user":
 					switch obj[0].(string) {
