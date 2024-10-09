@@ -146,12 +146,13 @@ log.WithField("message", "afterRun").Debug("hello")
 
 func (rock *RocketCon) run() {
 	log.WithField("message", "Method").Debug("run")
-	return 
+	
 	
 	// Set some websocket tunables
 	const socketreadsizelimit = 65536
 	const pingtime = 120 * time.Second
 	const timeout = 125 * time.Second
+	return 
 log.WithField("message", "Method").Debug("Middlerun")
 	// Define Websocket URL
 	wsURL := rock.getWsURL()
