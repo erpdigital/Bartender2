@@ -287,8 +287,10 @@ log.WithField("message", "Method").Debug("3")
 						log.WithField("message", "Method").Debug(obj[1])
 						id := obj[1].(map[string]interface{})["rid"].(string)
 						name := obj[1].(map[string]interface{})["name"].(string)
+						log.WithField("message", "Method").Debug("Ok? here")
 						rock.channels[id] = name
 						rock.subscribeRoom(id)
+						log.WithField("message", "Method").Debug("After subsription")
 					}
 				case "stream-room-messages":
 					for _, val := range obj {
