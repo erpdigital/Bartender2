@@ -54,7 +54,11 @@ func (rock *RocketCon) handleMessageObject(obj map[string]interface{}) Message {
 	msg.RoomId = obj["rid"].(string)
 	msg.UserId = obj["u"].(map[string]interface{})["_id"].(string)
 	msg.UserName = obj["u"].(map[string]interface{})["username"].(string)
-
+		// Check if the bot name is included in the message text
+	if !strings.Contains(strings.ToLower(msg.Text), fmt.Sprintf("@%s", strings.ToLower(rock.UserName))) {
+		// Prepend "@rocket.cat" to the message text if the bot name is not present
+		msg.Text = "@rocket.cat " + msg.Text
+	}
 	if attachments, ok := obj["attachments"]; ok && attachments != nil {
 		msg.Attachments = make([]attachment, 0)
 		for _, val := range attachments.([]interface{}) {
