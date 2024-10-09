@@ -27,7 +27,7 @@ func main() {
 	}
 
 	setLogLevel(cfg.LogLevel)
-
+	log.WithField("message", "Before Connection").Debug("NewConnectionFromConfig")
 	rock, err := rocket.NewConnectionFromConfig(cfg)
 
 	if err != nil {
@@ -41,13 +41,13 @@ func main() {
 		WithField("hostSSL", rock.HostSSL).
 		WithField("userName", rock.UserName).
 		Debug("Connection to rocketchat established.")
-
+	
 	err = rock.UserTemporaryStatus(rocket.STATUS_ONLINE)
 	if err != nil {
 		log.WithError(err).Error("Cannot set temporary status to online.")
 	}
 	//rock.UserDefaultStatus(rocket.STATUS_ONLINE)
-
+log.WithField("message", "Before Connection").Debug("OPenai")
 	oa := openai.NewFromConfig(cfg)
 
 	hist := NewHistoryFromConfig(cfg)
