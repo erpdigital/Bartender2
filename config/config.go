@@ -44,6 +44,7 @@ type ModelParams struct {
 }
 
 func NewConfig(path string) (*Config, error) {
+	log.WithField("message", "Method").Debug("Config")
 	file, err := os.ReadFile(path)
 	if err != nil {
 		return nil, fmt.Errorf("cannot read configfile: %w", err)
