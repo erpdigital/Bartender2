@@ -176,7 +176,7 @@ func (msg *Message) React(emoji string) error {
 func (msg *Message) GetNotAddressedText() string {
 	r := msg.Text
 	if len(msg.Text) > 2 && msg.AmIPinged {
-		r = string(strings.ToLower(msg.Text)[len(msg.rocketCon.UserName)+2:])
+		r = string(strings.ToLower(msg.Text))
 	}
 	return r
 }
