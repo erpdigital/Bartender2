@@ -292,7 +292,9 @@ log.WithField("message", "Method").Debug("3")
 					}
 				case "stream-room-messages":
 					for _, val := range obj {
+						log.WithField("message", "Method").Debug("15")
 						message := rock.handleMessageObject(val.(map[string]interface{}))
+						log.WithField("message", "Method").Debug("16")
 						if message.IsNew && !message.IsMe {
 							select {
 							case rock.newMessages <- message:
@@ -311,6 +313,7 @@ log.WithField("message", "Method").Debug("3")
 			case "ready":
 				break
 			case "ping":
+				log.WithField("message", "Method").Debug("17")
 				pong := map[string]string{
 					"msg": "pong",
 				}
