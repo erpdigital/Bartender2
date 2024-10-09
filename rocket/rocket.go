@@ -126,7 +126,7 @@ func (rock *RocketCon) init() error {
 		time.Sleep(2 * time.Second) // Optional: delay before restarting
 		}
 	}()
-
+log.WithField("message", "afterRun").Debug("hello")
 	// Send Init Messages
 	rock.connect()
 	err := rock.login()
