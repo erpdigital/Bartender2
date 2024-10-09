@@ -122,7 +122,7 @@ func (rock *RocketCon) init() error {
 			log.WithField("error", r).Error("Recovered from panic in run method")
 			}
 		}()
-		rock.run() // Call the run method
+		//rock.run() // Call the run method
 		time.Sleep(2 * time.Second) // Optional: delay before restarting
 		}
 	}()
