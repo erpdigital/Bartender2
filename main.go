@@ -14,7 +14,7 @@ import (
 func main() {
 	log.SetFormatter(&log.TextFormatter{})
 	log.SetLevel(log.InfoLevel)
-	log.WithField("message", "MAIN").Debug("I am in MAIN")
+
 	configFile := os.Getenv("BARTENDER_CONFIG")
 	if len(configFile) == 0 {
 		configFile = "config.yaml"
@@ -53,6 +53,7 @@ func main() {
 	hist := NewHistoryFromConfig(cfg)
 
 	for {
+			log.WithField("message", "Before").Debug("Get messages")
 		// Wait for a new message to come in
 		msg, err := rock.GetNewMessage()
 
@@ -65,6 +66,7 @@ func main() {
 		// If begins with '@Username ' or is in private chat
 		// @todo robot must be pinged in a private room
 		if msg.AmIPinged || msg.IsDirect {
+		        log.WithField("message", "MAIN").Debug("I am in MAIN")
 			log.WithField("message", msg).Debug("Incoming message for the bot.")
 			err = OpenAIResponse(msg, oa, hist)
 			if err != nil {
