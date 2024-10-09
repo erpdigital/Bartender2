@@ -272,13 +272,15 @@ log.WithField("message", "Method").Debug("3")
 			case "changed":
 				log.WithField("message", "Method").Debug("11")
 				log.WithField("message", "Method").Debug(pack) 
-				
-				return
+				log.WithField("message", "Method").Debug(pack["fields"])
 // Check if it exists and is not nil
 			
 				obj := pack["fields"].(map[string]interface{})["args"].([]interface{})
+				log.WithField("message", "Method").Debug("12")
+				log.WithField("message", "Method").Debug(pack["collection"])
 				switch pack["collection"].(string) {
 				case "stream-notify-user":
+					log.WithField("message", "Method").Debug("13")
 					switch obj[0].(string) {
 					case "inserted":
 						id := obj[1].(map[string]interface{})["rid"].(string)
