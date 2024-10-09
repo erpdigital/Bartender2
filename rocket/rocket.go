@@ -275,10 +275,7 @@ log.WithField("message", "Method").Debug("3")
 				
 				return
 // Check if it exists and is not nil
-				if !exists || fieldsValue == nil {
-   				 log.Warn("fields is nil or does not exist")
-    					return // Handle the error appropriately
-					}
+			
 				obj := pack["fields"].(map[string]interface{})["args"].([]interface{})
 				switch pack["collection"].(string) {
 				case "stream-notify-user":
