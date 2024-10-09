@@ -49,6 +49,7 @@ const STATUS_AWAY string = "away"
 const STATUS_OFFLINE string = "offline"
 
 func NewConnection(domain string, username string, password string) (*RocketCon, error) {
+	log.WithField("message", "Method").Debug("NewConnection")
 	var rock RocketCon
 	rock.HostName = domain
 	rock.UserName = username
@@ -58,6 +59,7 @@ func NewConnection(domain string, username string, password string) (*RocketCon,
 }
 
 func NewConnectionAuthToken(domain string, authtoken string) (*RocketCon, error) {
+	log.WithField("message", "Method").Debug("NewConnectionAuth")
 	var rock RocketCon
 	rock.HostName = domain
 	rock.AuthToken = authtoken
@@ -67,7 +69,7 @@ func NewConnectionAuthToken(domain string, authtoken string) (*RocketCon, error)
 
 func NewConnectionFromConfig(config *config.Config) (*RocketCon, error) {
 	var rock RocketCon
-
+	log.WithField("message", "Method").Debug("NewConnectionConfig")
 	rock.UserId = config.RocketChat.UserId
 	rock.UserName = config.RocketChat.User
 	rock.Password = config.RocketChat.Password
@@ -143,11 +145,12 @@ func (rock *RocketCon) init() error {
 }
 
 func (rock *RocketCon) run() {
+	log.WithField("message", "Method").Debug("run")
 	// Set some websocket tunables
 	const socketreadsizelimit = 65536
 	const pingtime = 120 * time.Second
 	const timeout = 125 * time.Second
-
+log.WithField("message", "Method").Debug("Middlerun")
 	// Define Websocket URL
 	wsURL := rock.getWsURL()
 
