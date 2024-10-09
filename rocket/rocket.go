@@ -283,11 +283,11 @@ log.WithField("message", "Method").Debug("3")
 					log.WithField("message", "Method").Debug("13")
 					switch obj[0].(string) {
 					case "inserted":
-						return 
+						
 						log.WithField("message", "Method").Debug("14")
 						log.WithField("message", "Method").Debug(obj[1])
 						id := obj[1].(map[string]interface{})["rid"].(string)
-						name := obj[1].(map[string]interface{})["name"].(string)
+						name := obj[1].(map[string]interface{})["fname"].(string)
 						log.WithField("message", "Method").Debug("Ok? here")
 						rock.channels[id] = name
 						rock.subscribeRoom(id)
