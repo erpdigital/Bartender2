@@ -152,8 +152,7 @@ func (rock *RocketCon) run() {
 	const socketreadsizelimit = 65536
 	const pingtime = 120 * time.Second
 	const timeout = 125 * time.Second
-	return 
-log.WithField("message", "Method").Debug("Middlerun")
+	log.WithField("message", "Method").Debug("rock.getWsUrl")
 	// Define Websocket URL
 	wsURL := rock.getWsURL()
 
@@ -163,8 +162,10 @@ log.WithField("message", "Method").Debug("Middlerun")
 		log.WithError(err).WithField("wsURL", wsURL).Error("Cannot initiate websocket")
 		close(rock.quit)
 	}
+	log.WithField("message", "Method").Debug("ws.close")
 	defer ws.Close()
-
+	return 
+	log.WithField("message", "Method").Debug("Middlerun")
 	// Configure Websocket using Tunables
 	ws.SetReadLimit(socketreadsizelimit)
 	ws.SetReadDeadline(time.Now().Add(timeout))
