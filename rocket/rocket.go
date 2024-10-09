@@ -272,7 +272,7 @@ log.WithField("message", "Method").Debug("3")
 			case "changed":
 				log.WithField("message", "Method").Debug("11")
 				log.WithField("message", "Method").Debug(pack) 
-				fieldsValue, exists := pack
+				
 				return
 // Check if it exists and is not nil
 				if !exists || fieldsValue == nil {
