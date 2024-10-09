@@ -64,18 +64,18 @@ func main() {
 
 		// If begins with '@Username ' or is in private chat
 		// @todo robot must be pinged in a private room
-		if msg.AmIPinged || msg.IsDirect {
-			log.WithField("message", msg).Debug("Incoming message for the bot.")
-			err = OpenAIResponse(msg, oa, hist)
-			if err != nil {
-				log.WithError(err).Error("OpenAI request failed.")
-				_, err = msg.Reply(fmt.Sprintf("@%s :x: Sorry, something went wrong while processing your request. This could be due to a configuration issue, a problem with the OpenAI API, or a bug in the system. Please check your configuration settings or try again later. More details can be found in the logs. :x:", msg.UserName))
-				if err != nil {
-					log.WithError(err).Error("Cannot send reply about the error rocketchat.")
-				}
+		//if msg.AmIPinged || msg.IsDirect {
+		//	log.WithField("message", msg).Debug("Incoming message for the bot.")
+		//	err = OpenAIResponse(msg, oa, hist)
+		//	if err != nil {
+		//		log.WithError(err).Error("OpenAI request failed.")
+		//		_, err = msg.Reply(fmt.Sprintf("@%s :x: Sorry, something went wrong while processing your request. This could be due to a configuration issue, a problem with the OpenAI API, or a bug in the system. Please check your configuration settings or try again later. More details can be found in the logs. :x:", msg.UserName))
+		//		if err != nil {
+		//			log.WithError(err).Error("Cannot send reply about the error rocketchat.")
+		//		}
 
-			}
-		}
+		//	}
+		//}
 	}
 }
 
