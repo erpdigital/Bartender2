@@ -173,12 +173,12 @@ func (rock *RocketCon) run() {
 		ws.SetReadDeadline(time.Now().Add(timeout))
 		return nil
 	})
-	log.WithField("message", "Method").Debug("AfterPong")
-	return 
+
 	
 	tick := time.NewTicker(pingtime)
 	defer tick.Stop()
-
+	log.WithField("message", "Method").Debug("Tickstop")
+	
 	// Manage Method/Subscription Ids
 	go func() {
 		for i := uint64(0); ; i++ {
@@ -186,7 +186,8 @@ func (rock *RocketCon) run() {
 			rock.nextId <- fmt.Sprintf("%d", i)
 		}
 	}()
-
+log.WithField("message", "Method").Debug("Subscription")
+	
 	// Manage Results map
 	go func() {
 		for {
@@ -202,7 +203,8 @@ func (rock *RocketCon) run() {
 			}
 		}
 	}()
-
+	log.WithField("message", "Method").Debug("ManageResult MAp")
+return 
 	// Send Thread
 	go func() {
 		for {
