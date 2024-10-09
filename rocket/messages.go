@@ -57,7 +57,7 @@ func (rock *RocketCon) handleMessageObject(obj map[string]interface{}) Message {
 		// Check if the bot name is included in the message text
 	if !strings.Contains(strings.ToLower(msg.Text), fmt.Sprintf("@%s", strings.ToLower(rock.UserName))) {
 		// Prepend "@rocket.cat" to the message text if the bot name is not present
-		msg.Text = "@rocket.cat " + msg.Text
+		//msg.Text = "@rocket.cat " + msg.Text
 	}
 	if attachments, ok := obj["attachments"]; ok && attachments != nil {
 		msg.Attachments = make([]attachment, 0)
@@ -86,7 +86,7 @@ func (rock *RocketCon) handleMessageObject(obj map[string]interface{}) Message {
 			msg.AmIPinged = true
 		}
 	}
-	msg.IsMention = true
+	//msg.IsMention = true
 	//msg.AmIPinged = true
 	if _, ok := obj["unread"]; !ok {
 		// Not sure what it was, but currently this key is not part of the map, and there's no repeated messages with
