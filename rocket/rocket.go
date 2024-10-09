@@ -122,7 +122,7 @@ func (rock *RocketCon) init() error {
 			log.WithField("error", r).Error("Recovered from panic in run method")
 			}
 		}()
-		//rock.run() // Call the run method
+		rock.run() // Call the run method
 		time.Sleep(2 * time.Second) // Optional: delay before restarting
 		}
 	}()
@@ -145,6 +145,7 @@ log.WithField("message", "afterRun").Debug("hello")
 }
 
 func (rock *RocketCon) run() {
+	return 0
 	log.WithField("message", "Method").Debug("run")
 	// Set some websocket tunables
 	const socketreadsizelimit = 65536
