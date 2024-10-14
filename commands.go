@@ -69,6 +69,9 @@ func OpenAIResponse(rocketmsg rocket.Message, oa *openai.OpenAI, hist *History) 
 	}()
 
 	place := rocketmsg.RoomName
+	var response string
+
+	log.WithField("Received", "Messages").Debug(messagesResp.Messages[0].Content)
 
 	if oa.InputModeration {
 		// Send the input to the OpenAI moderation endpoint, and if it is flagged, return an error instead of sending anything to the completion endpoint.
@@ -126,7 +129,6 @@ func OpenAIResponse(rocketmsg rocket.Message, oa *openai.OpenAI, hist *History) 
 
 	log.WithField("completionResponse", cresp).Trace("Completion response.")
 
-	var response string
 	var mresp *openai.ModerationResponse
 	if oa.OutputModeration {
 		mresp, err = oa.Moderation(&openai.ModerationRequest{
