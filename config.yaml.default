@@ -9,7 +9,8 @@ RocketChat:
 OpenAI:
   HostName: api.openai.com # OpenAI hostname
   ApiToken: verysecret-apitoken
-
+  AssistantID: assistantID
+  AssistanceEndpoint: v1/assistants # Chat assistant
   CompletionEndpoint: v1/chat/completions # Chat completions endpoint
   ModerationEndpoint: v1/moderations # Moderations endpoint
 
