@@ -306,7 +306,7 @@ func (o *OpenAI) CreateThread() (*ThreadResponse, error) {
 	var tResp ThreadResponse
 
 	// Send the POST request with an empty body
-	err := o.request(url, nil, &tResp) // `nil` is passed for an empty body
+	err := o.requestAPI("GET", url, nil, &tResp) // `nil` is passed for an empty body
 	if err != nil {
 		return nil, fmt.Errorf("an error occurred while creating the thread: %w", err)
 	}
