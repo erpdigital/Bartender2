@@ -37,7 +37,7 @@ func OpenAIResponse(rocketmsg rocket.Message, oa *openai.OpenAI, hist *History) 
 		log.Fatalf("Error retrieving assistant: %v", err)
 	}
 
-	log.WithField("message", "Before Connection").Debug(assistant.Name)
+	log.WithField("message", "Assistent model").Debug(assistant.Model)
 	msg := openai.Message{
 		Role:    "user",
 		Content: rocketmsg.GetNotAddressedText(),
