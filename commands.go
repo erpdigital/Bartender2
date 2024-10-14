@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"time"
 
@@ -68,100 +67,100 @@ func OpenAIResponse(rocketmsg rocket.Message, oa *openai.OpenAI, hist *History) 
 		rocketmsg.SetIsTyping(false)
 	}()
 
-	place := rocketmsg.RoomName
+	//place := rocketmsg.RoomName
 	var response string
-
-	log.WithField("Received", "Messages").Debug(messagesResp.Messages[0].Content)
-
-	if oa.InputModeration {
-		// Send the input to the OpenAI moderation endpoint, and if it is flagged, return an error instead of sending anything to the completion endpoint.
-		mresp, err := oa.Moderation(&openai.ModerationRequest{
-			Input: rocketmsg.GetNotAddressedText(),
-		})
-		if err != nil {
-			return fmt.Errorf("cannot perform perliminary request to the moderation endpoint: %w", err)
-		}
-
-		log.WithField("moderationResponse", mresp).Debug("Preliminary (input) moderation response.")
-
-		if mresp.IsFlagged() {
-			// @todo configurable message?
-			_, err = rocketmsg.Reply(fmt.Sprintf("@%s :triangular_flag_on_post: Our bot uses OpenAI's moderation system, which flagged your message as inappropriate. Please try rephrasing your message to avoid any offensive or inappropriate content. REASON: %s :triangular_flag_on_post:",
-				rocketmsg.UserName, mresp.FlaggedReason()))
+	response = messagesResp.Messages[0].Content[0].Text.Value
+	log.WithField("Received", "Messages").Debug(messagesResp.Messages[0].Content[0].Text.Value)
+	/*
+		if oa.InputModeration {
+			// Send the input to the OpenAI moderation endpoint, and if it is flagged, return an error instead of sending anything to the completion endpoint.
+			mresp, err := oa.Moderation(&openai.ModerationRequest{
+				Input: rocketmsg.GetNotAddressedText(),
+			})
 			if err != nil {
-				return fmt.Errorf("cannot send reply to rocketchat: %w", err)
+				return fmt.Errorf("cannot perform perliminary request to the moderation endpoint: %w", err)
 			}
-			return nil
+
+			log.WithField("moderationResponse", mresp).Debug("Preliminary (input) moderation response.")
+
+			if mresp.IsFlagged() {
+				// @todo configurable message?
+				_, err = rocketmsg.Reply(fmt.Sprintf("@%s :triangular_flag_on_post: Our bot uses OpenAI's moderation system, which flagged your message as inappropriate. Please try rephrasing your message to avoid any offensive or inappropriate content. REASON: %s :triangular_flag_on_post:",
+					rocketmsg.UserName, mresp.FlaggedReason()))
+				if err != nil {
+					return fmt.Errorf("cannot send reply to rocketchat: %w", err)
+				}
+				return nil
+			}
 		}
-	}
 
-	var systemMessage = openai.Message{
-		Role:    "system",
-		Content: oa.PrePrompt,
-	}
-
-	// Prepend the preprompt
-	var messages []openai.Message
-	if len(oa.PrePrompt) > 0 {
-		messages = append(messages, systemMessage)
-	}
-	messages = append(messages, hist.AsOpenAIMessages(place)...)
-
-	messages = append(messages, msg)
-
-	OAUserid := "" // Userid to send OpenAI. If empty, the no UserId is sent.
-	if oa.SendUserId {
-		OAUserid = rocketmsg.UserId
-	}
-	cresp, err := oa.Completion(oa.NewCompletionRequest(messages, OAUserid))
-	if err != nil {
-		if errors.Is(err, &openai.ErrorContextLengthExceeded{}) {
-			// If the reason for the error is context_length_exceeded, we clear history, so it does not happen on the next comment.
-			hist.Clear(place)
-			log.Debug("To prevent context_length_exceeded error to happen repeatedly, the history has been cleared.")
+		var systemMessage = openai.Message{
+			Role:    "system",
+			Content: oa.PrePrompt,
 		}
-		return fmt.Errorf("cannot perform completion request: %w", err)
-	}
 
-	if len(cresp.Choices) == 0 {
-		return fmt.Errorf("no choices returned")
-	}
+		// Prepend the preprompt
+		var messages []openai.Message
+		if len(oa.PrePrompt) > 0 {
+			messages = append(messages, systemMessage)
+		}
+		messages = append(messages, hist.AsOpenAIMessages(place)...)
 
-	log.WithField("completionResponse", cresp).Trace("Completion response.")
+		messages = append(messages, msg)
 
-	var mresp *openai.ModerationResponse
-	if oa.OutputModeration {
-		mresp, err = oa.Moderation(&openai.ModerationRequest{
-			Input: cresp.Choices[0].Message.Content,
-		})
+		OAUserid := "" // Userid to send OpenAI. If empty, the no UserId is sent.
+		if oa.SendUserId {
+			OAUserid = rocketmsg.UserId
+		}
+		cresp, err := oa.Completion(oa.NewCompletionRequest(messages, OAUserid))
 		if err != nil {
-			return fmt.Errorf("cannot perform follow-up request to the moderation endpoint (output check): %w", err)
+			if errors.Is(err, &openai.ErrorContextLengthExceeded{}) {
+				// If the reason for the error is context_length_exceeded, we clear history, so it does not happen on the next comment.
+				hist.Clear(place)
+				log.Debug("To prevent context_length_exceeded error to happen repeatedly, the history has been cleared.")
+			}
+			return fmt.Errorf("cannot perform completion request: %w", err)
 		}
 
-		if mresp.IsFlagged() {
-			// @todo better explanation that it is the output that got flagged.
-			response = fmt.Sprintf(":triangular_flag_on_post: (output flagged: %s) :triangular_flag_on_post:", mresp.FlaggedReason())
+		if len(cresp.Choices) == 0 {
+			return fmt.Errorf("no choices returned")
 		}
 
-		log.WithField("moderationResponse", mresp).Trace("Follow-up (output) moderation response.")
+		log.WithField("completionResponse", cresp).Trace("Completion response.")
 
-	}
+		var mresp *openai.ModerationResponse
+		if oa.OutputModeration {
+			mresp, err = oa.Moderation(&openai.ModerationRequest{
+				Input: cresp.Choices[0].Message.Content,
+			})
+			if err != nil {
+				return fmt.Errorf("cannot perform follow-up request to the moderation endpoint (output check): %w", err)
+			}
 
-	response += cresp.Choices[0].Message.Content
+			if mresp.IsFlagged() {
+				// @todo better explanation that it is the output that got flagged.
+				response = fmt.Sprintf(":triangular_flag_on_post: (output flagged: %s) :triangular_flag_on_post:", mresp.FlaggedReason())
+			}
 
-	// @todo further calls if finishReason indicates that the response is not completed.
-	_, err = rocketmsg.Reply(fmt.Sprintf("@%s %s", rocketmsg.UserName, response))
-	if err != nil {
-		return fmt.Errorf("cannot send reply to rocketchat: %w", err)
-	}
+			log.WithField("moderationResponse", mresp).Trace("Follow-up (output) moderation response.")
 
-	if mresp == nil || !mresp.IsFlagged() {
-		hist.Add(place, msg)
-		hist.Add(place, openai.Message{
-			Role:    "assistant",
-			Content: cresp.Choices[0].Message.Content,
-		})
-	}
+		}
 
+		response += cresp.Choices[0].Message.Content
+
+		// @todo further calls if finishReason indicates that the response is not completed.
+		_, err = rocketmsg.Reply(fmt.Sprintf("@%s %s", rocketmsg.UserName, response))
+		if err != nil {
+			return fmt.Errorf("cannot send reply to rocketchat: %w", err)
+		}
+
+		if mresp == nil || !mresp.IsFlagged() {
+			hist.Add(place, msg)
+			hist.Add(place, openai.Message{
+				Role:    "assistant",
+				Content: cresp.Choices[0].Message.Content,
+			})
+		}
+	*/
 	return nil
 }
