@@ -33,6 +33,20 @@ func (e *ErrorContextLengthExceeded) Is(tgt error) bool {
 	return true
 }
 
+type ThreadRequest struct {
+	AssistantID  string `json:"assistant_id"` // ID of the assistant
+	Instructions string `json:"instructions"` // Instructions for the thread
+}
+
+type ThreadResponse struct {
+	ThreadID string `json:"id"` // ID of the created thread
+	Status   string `json:"status"`
+	Error    struct {
+		Message string `json:"message"`
+		Code    string `json:"code"`
+	} `json:"error"`
+}
+
 // Struct to capture the assistant retrieval response
 type AssistantDetails struct {
 	ID     string `json:"id"`
@@ -96,7 +110,13 @@ func (o *OpenAI) ModerationURL() (string, error) {
 	}
 	return url, nil
 }
-
+func (o *OpenAI) ThreadURL() (string, error) {
+	url, err := url.JoinPath("https://", o.HostName, "/v1/threads")
+	if err != nil {
+		return "", fmt.Errorf("failed to build Thread URL: %w", err)
+	}
+	return url, nil
+}
 func (o *OpenAI) Completion(cReq *CompletionRequest) (*CompletionResponse, error) {
 	var cResp CompletionResponse
 	url, err := o.CompletionURL()
@@ -277,4 +297,24 @@ func (o *OpenAI) GetAssistantByID(assistantID string) (*AssistantDetails, error)
 	}
 
 	return &response, nil
+}
+func (o *OpenAI) CreateThread() (*ThreadResponse, error) {
+	// Define the URL for the threads endpoint
+	url := "https://api.openai.com/v1/threads"
+
+	// Initialize the response
+	var tResp ThreadResponse
+
+	// Send the POST request with an empty body
+	err := o.request(url, nil, &tResp) // `nil` is passed for an empty body
+	if err != nil {
+		return nil, fmt.Errorf("an error occurred while creating the thread: %w", err)
+	}
+
+	// Check for any API-specific errors
+	if tResp.Error.Message != "" {
+		return nil, fmt.Errorf("%s: %s", tResp.Error.Code, tResp.Error.Message)
+	}
+
+	return &tResp, nil
 }
