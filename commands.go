@@ -71,6 +71,11 @@ func OpenAIResponse(rocketmsg rocket.Message, oa *openai.OpenAI, hist *History) 
 	var response string
 	response += messagesResp.Messages[0].Content[0].Text.Value
 	log.WithField("Received", "Messages").Debug(messagesResp.Messages[0].Content[0].Text.Value)
+	_, err = rocketmsg.Reply(fmt.Sprintf("@%s %s", rocketmsg.UserName, response))
+	if err != nil {
+		return fmt.Errorf("cannot send reply to rocketchat: %w", err)
+	}
+
 	/*
 		if oa.InputModeration {
 			// Send the input to the OpenAI moderation endpoint, and if it is flagged, return an error instead of sending anything to the completion endpoint.
