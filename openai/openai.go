@@ -373,7 +373,7 @@ func (o *OpenAI) GetMessages(threadID string) (*MessageListResponse, error) {
 	var mResp MessageListResponse
 
 	// Send the GET request (note that request body is nil for GET)
-	err := o.request(url, nil, &mResp)
+	err := o.requestAPI("GET", url, nil, &mResp)
 	if err != nil {
 		return nil, fmt.Errorf("an error occurred while fetching the messages: %w", err)
 	}
