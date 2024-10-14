@@ -318,3 +318,70 @@ func (o *OpenAI) CreateThread() (*ThreadResponse, error) {
 
 	return &tResp, nil
 }
+func (o *OpenAI) AddMessageToThread(threadID string, msg Message) (*MessageResponse, error) {
+	// Define the URL for adding a message to the thread
+	url := fmt.Sprintf("https://api.openai.com/v1/threads/%s/messages", threadID)
+
+	// Initialize the response
+	var mResp MessageResponse
+
+	// Send the POST request with the prepared message
+	err := o.requestAPI("POST", url, msg, &mResp)
+	if err != nil {
+		return nil, fmt.Errorf("an error occurred while adding the message: %w", err)
+	}
+
+	// Check for any API-specific errors
+	if mResp.Error.Message != "" {
+		return nil, fmt.Errorf("%s: %s", mResp.Error.Code, mResp.Error.Message)
+	}
+
+	return &mResp, nil
+}
+
+func (o *OpenAI) CreateRun(threadID string) (*RunResponse, error) {
+	// Define the URL for creating a run within the thread
+	url := fmt.Sprintf("https://api.openai.com/v1/threads/%s/runs", threadID)
+
+	// Use o.AssistantID and o.PrePrompt in the request
+	rReq := &RunRequest{
+		AssistantID:  o.AssistantID, // Use o.AssistantID here
+		Instructions: o.PrePrompt,   // Use o.PrePrompt here
+	}
+
+	// Initialize the response
+	var rResp RunResponse
+
+	// Send the POST request with the run details
+	err := o.request(url, rReq, &rResp)
+	if err != nil {
+		return nil, fmt.Errorf("an error occurred while creating the run: %w", err)
+	}
+
+	// Check for any API-specific errors
+	if rResp.Error.Message != "" {
+		return nil, fmt.Errorf("%s: %s", rResp.Error.Code, rResp.Error.Message)
+	}
+
+	return &rResp, nil
+}
+func (o *OpenAI) GetMessages(threadID string) (*MessageListResponse, error) {
+    // Define the URL for fetching messages from the thread
+    url := fmt.Sprintf("https://api.openai.com/v1/threads/%s/messages", threadID)
+
+    // Initialize the response
+    var mResp MessageListResponse
+
+    // Send the GET request (note that request body is nil for GET)
+    err := o.request(url, nil, &mResp)
+    if err != nil {
+        return nil, fmt.Errorf("an error occurred while fetching the messages: %w", err)
+    }
+
+    // Check for any API-specific errors
+    if mResp.Error.Message != "" {
+        return nil, fmt.Errorf("%s: %s", mResp.Error.Code, mResp.Error.Message)
+    }
+
+    return &mResp, nil
+}

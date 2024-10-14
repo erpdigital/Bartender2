@@ -22,12 +22,25 @@ type CompletionRequest struct {
 	FrequencyPenalty *float64  `json:"frequency_penalty,omitempty"`
 	User             *string   `json:"user,omitempty"`
 }
-
+type MessageResponse struct {
+	ID     string `json:"id"`     // ID of the created message
+	Status string `json:"status"` // Status of the operation (e.g., "success")
+	Error  struct {
+		Message string `json:"message"`
+		Code    string `json:"code"`
+	} `json:"error"`
+}
 type Message struct {
 	Role    string `json:"role"`
 	Content string `json:"content"`
 }
-
+type MessageListResponse struct {
+	Messages []Message `json:"messages"`
+	Error    struct {
+		Message string `json:"message"`
+		Code    string `json:"code"`
+	} `json:"error"`
+}
 type Choice struct {
 	Index        int     `json:"index"`
 	FinishReason string  `json:"finish_reason"`
@@ -38,4 +51,16 @@ type Usage struct {
 	PromptTokens     int `json:"prompt_tokens"`
 	CompletionTokens int `json:"completion_tokens"`
 	TotalTokens      int `json:"total_tokens"`
+}
+type RunRequest struct {
+	AssistantID  string `json:"assistant_id"` // ID of the assistant
+	Instructions string `json:"instructions"` // Instructions for the run
+}
+type RunResponse struct {
+	RunID  string `json:"id"`     // ID of the created run
+	Status string `json:"status"` // Status of the operation (e.g., "success")
+	Error  struct {
+		Message string `json:"message"`
+		Code    string `json:"code"`
+	} `json:"error"`
 }

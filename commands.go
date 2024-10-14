@@ -47,6 +47,29 @@ func OpenAIResponse(rocketmsg rocket.Message, oa *openai.OpenAI, hist *History) 
 		Role:    "user",
 		Content: rocketmsg.GetNotAddressedText(),
 	}
+	threadmessage, err := oa.AddMessageToThread(thread.ThreadID, msg)
+	if err != nil {
+		log.Fatalf("Error Adding Message to Thread: %v", err)
+	}
+	log.WithField("message", "Thread Message").Debug(threadmessage.ID)
+	// Create the run in the thread using the PrePrompt and AssistantID from the struct
+	runResp, err := oa.CreateRun(thread.ThreadID)
+	if err != nil {
+		log.Fatalf("Error Creating RunID: %v", err)
+	}
+	log.WithField("message", "Create Run").Debug(runResp.RunID)
+	messagesResp, err := oa.GetMessages(thread.ThreadID)
+	if err != nil {
+		log.Fatalf("Error fetching messages: %v", err)
+	}
+	// Print out the messages
+	for _, message := range messagesResp.Messages {
+		log.Printf("Role: %s, Content: %s", message.Role, message.Content)
+	}
+	if err != nil {
+		log.Fatalf("Error creating run: %v", err)
+	}
+
 	rocketmsg.SetIsTyping(true)
 	defer func() {
 		rocketmsg.SetIsTyping(false)
