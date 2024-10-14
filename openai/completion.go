@@ -51,7 +51,7 @@ type MessageRun struct {
 	RunID       *string          `json:"run_id,omitempty"` // RunID can be null
 }
 type MessageListResponse struct {
-	Messages []Message `json:"data"`
+	Messages []MessageRun `json:"data"`
 
 	Object  string  `json:"object"`
 	FirstID *string `json:"first_id"`
