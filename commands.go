@@ -69,7 +69,7 @@ func OpenAIResponse(rocketmsg rocket.Message, oa *openai.OpenAI, hist *History) 
 
 	//place := rocketmsg.RoomName
 	var response string
-	response = messagesResp.Messages[0].Content[0].Text.Value
+	response += messagesResp.Messages[0].Content[0].Text.Value
 	log.WithField("Received", "Messages").Debug(messagesResp.Messages[0].Content[0].Text.Value)
 	/*
 		if oa.InputModeration {
