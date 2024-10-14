@@ -11,7 +11,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/mimrock/rocketchat_openai_bot/config"
+	"Bartender2/config"
 
 	"github.com/gorilla/websocket"
 	log "github.com/sirupsen/logrus"
@@ -98,7 +98,7 @@ func NewConnectionFromConfig(config *config.Config) (*RocketCon, error) {
 }
 
 func (rock *RocketCon) init() error {
-		log.WithField("message", "INit").Debug("I am in init")
+	log.WithField("message", "INit").Debug("I am in init")
 	// Init variables
 	rock.send = make(chan interface{}, 1024)
 	rock.receive = make(chan interface{}, 1024)
@@ -115,18 +115,18 @@ func (rock *RocketCon) init() error {
 	rock.channels = make(map[string]string)
 
 	go func() {
-	  for {
-		// Use defer to recover from any panic in the run method
-		defer func() {
-		if r := recover(); r != nil {
-			log.WithField("error", r).Error("Recovered from panic in run method")
-			}
-		}()
-		rock.run() // Call the run method
-		time.Sleep(2 * time.Second) // Optional: delay before restarting
+		for {
+			// Use defer to recover from any panic in the run method
+			defer func() {
+				if r := recover(); r != nil {
+					log.WithField("error", r).Error("Recovered from panic in run method")
+				}
+			}()
+			rock.run()                  // Call the run method
+			time.Sleep(2 * time.Second) // Optional: delay before restarting
 		}
 	}()
-log.WithField("message", "afterRun").Debug("hello")
+	log.WithField("message", "afterRun").Debug("hello")
 	// Send Init Messages
 	rock.connect()
 	err := rock.login()
@@ -146,8 +146,7 @@ log.WithField("message", "afterRun").Debug("hello")
 
 func (rock *RocketCon) run() {
 	log.WithField("message", "Method").Debug("run")
-	
-	
+
 	// Set some websocket tunables
 	const socketreadsizelimit = 65536
 	const pingtime = 120 * time.Second
@@ -164,7 +163,7 @@ func (rock *RocketCon) run() {
 	}
 	log.WithField("message", "Method").Debug("ws.close")
 	defer ws.Close()
-	
+
 	// Configure Websocket using Tunables
 	ws.SetReadLimit(socketreadsizelimit)
 	ws.SetReadDeadline(time.Now().Add(timeout))
@@ -174,11 +173,10 @@ func (rock *RocketCon) run() {
 		return nil
 	})
 
-	
 	tick := time.NewTicker(pingtime)
 	defer tick.Stop()
 	log.WithField("message", "Method").Debug("Tickstop")
-	
+
 	// Manage Method/Subscription Ids
 	go func() {
 		for i := uint64(0); ; i++ {
@@ -186,8 +184,8 @@ func (rock *RocketCon) run() {
 			rock.nextId <- fmt.Sprintf("%d", i)
 		}
 	}()
-log.WithField("message", "Method").Debug("Subscription")
-	
+	log.WithField("message", "Method").Debug("Subscription")
+
 	// Manage Results map
 	go func() {
 		for {
@@ -217,7 +215,7 @@ log.WithField("message", "Method").Debug("Subscription")
 			}
 		}
 	}()
-log.WithField("message", "Method").Debug("1")
+	log.WithField("message", "Method").Debug("1")
 
 	// Read Thread
 	for {
@@ -228,22 +226,22 @@ log.WithField("message", "Method").Debug("1")
 			log.WithError(err).WithField("ws", ws).Warn("Cannot read websocket.")
 			break
 		}
-log.WithField("message", "Method").Debug("2")
+		log.WithField("message", "Method").Debug("2")
 		var pack map[string]interface{}
 		err = json.Unmarshal(raw, &pack)
 		if err != nil {
 			log.WithError(err).WithField("raw", raw).Warn("Cannot unmarshal data read from websocket.")
 			continue
 		}
-log.WithField("message", "Method").Debug("3")
+		log.WithField("message", "Method").Debug("3")
 		if msg, ok := pack["msg"]; ok {
 			switch msg {
 			case "connected":
 				if session, ok := pack["session"].(string); ok {
-   				 rock.session = session
-						} else {
-							    log.Warn("Session is nil or not a string")
-								}
+					rock.session = session
+				} else {
+					log.Warn("Session is nil or not a string")
+				}
 				log.WithField("message", "Method").Debug("4")
 			case "result":
 				rock.resultsMutex.RLock()
@@ -271,10 +269,10 @@ log.WithField("message", "Method").Debug("3")
 				break
 			case "changed":
 				log.WithField("message", "Method").Debug("11")
-				log.WithField("message", "Method").Debug(pack) 
+				log.WithField("message", "Method").Debug(pack)
 				log.WithField("message", "Method").Debug(pack["fields"])
-// Check if it exists and is not nil
-			
+				// Check if it exists and is not nil
+
 				obj := pack["fields"].(map[string]interface{})["args"].([]interface{})
 				log.WithField("message", "Method").Debug("12")
 				log.WithField("message", "Method").Debug(pack["collection"])
@@ -283,7 +281,7 @@ log.WithField("message", "Method").Debug("3")
 					log.WithField("message", "Method").Debug("13")
 					switch obj[0].(string) {
 					case "inserted":
-						
+
 						log.WithField("message", "Method").Debug("14")
 						log.WithField("message", "Method").Debug(obj[1])
 						id := obj[1].(map[string]interface{})["rid"].(string)

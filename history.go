@@ -1,12 +1,12 @@
 package main
 
 import (
+	"Bartender2/config"
 	"fmt"
-	"github.com/mimrock/rocketchat_openai_bot/config"
 	"strings"
 	"time"
 
-	"github.com/mimrock/rocketchat_openai_bot/openai"
+	"Bartender2/openai"
 )
 
 type TimedMessage struct {

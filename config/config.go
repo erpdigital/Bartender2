@@ -2,9 +2,10 @@ package config
 
 import (
 	"fmt"
-	"gopkg.in/yaml.v2"
 	"os"
 	"time"
+
+	"gopkg.in/yaml.v2"
 )
 
 type Config struct {
@@ -23,6 +24,7 @@ type Config struct {
 		ApiToken           string         `yaml:"ApiToken"`
 		CompletionEndpoint string         `yaml:"CompletionEndpoint"`
 		ModerationEndpoint string         `yaml:"ModerationEndpoint"`
+		AssistanceEndpoint string         `yaml:"AssistanceEndpoint"`
 		Model              string         `yaml:"Model"`
 		HistorySize        int            `yaml:"HistorySize"`
 		HistoryMaxLength   int            `yaml:"HistoryMaxLength"`
@@ -32,6 +34,7 @@ type Config struct {
 		OutputModeration   bool           `yaml:"OutputModeration"`
 		SendUserId         bool           `yaml:"SendUserId"`
 		ModelParams        ModelParams    `yaml:"ModelParams,omitempty"`
+		AssistantID        string         `yaml:"AssistantID"`
 	} `yaml:"OpenAI"`
 }
 

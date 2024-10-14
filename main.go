@@ -1,12 +1,12 @@
 package main
 
 import (
+	"Bartender2/openai"
 	"fmt"
-	"github.com/mimrock/rocketchat_openai_bot/openai"
 	"os"
 
-	"github.com/mimrock/rocketchat_openai_bot/config"
-	"github.com/mimrock/rocketchat_openai_bot/rocket"
+	"Bartender2/config"
+	"Bartender2/rocket"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -41,19 +41,21 @@ func main() {
 		WithField("hostSSL", rock.HostSSL).
 		WithField("userName", rock.UserName).
 		Debug("Connection to rocketchat established.")
-	
+
 	err = rock.UserTemporaryStatus(rocket.STATUS_ONLINE)
 	if err != nil {
 		log.WithError(err).Error("Cannot set temporary status to online.")
 	}
 	//rock.UserDefaultStatus(rocket.STATUS_ONLINE)
-log.WithField("message", "Before Connection").Debug("OPenai")
+	log.WithField("message", "Before Connection").Debug("OPenai")
+	//Open Ai Object
 	oa := openai.NewFromConfig(cfg)
 
+	//history object
 	hist := NewHistoryFromConfig(cfg)
 
 	for {
-			log.WithField("message", "Before").Debug("Get messages")
+		log.WithField("message", "Before").Debug("Get messages")
 		// Wait for a new message to come in
 		msg, err := rock.GetNewMessage()
 
@@ -66,7 +68,7 @@ log.WithField("message", "Before Connection").Debug("OPenai")
 		// If begins with '@Username ' or is in private chat
 		// @todo robot must be pinged in a private room
 		if msg.AmIPinged || msg.IsDirect {
-		        log.WithField("message", "MAIN").Debug("I am in MAIN")
+			log.WithField("message", "MAIN").Debug("I am in MAIN")
 			log.WithField("message", msg).Debug("Incoming message for the bot.")
 			err = OpenAIResponse(msg, oa, hist)
 			if err != nil {

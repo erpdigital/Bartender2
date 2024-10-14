@@ -4,7 +4,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/mimrock/rocketchat_openai_bot/openai"
+	"Bartender2/openai"
+
 	"github.com/stretchr/testify/assert"
 )
 

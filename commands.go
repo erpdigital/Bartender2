@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/mimrock/rocketchat_openai_bot/openai"
-	"github.com/mimrock/rocketchat_openai_bot/rocket"
+	"Bartender2/openai"
+	"Bartender2/rocket"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -31,6 +31,8 @@ func DemoResponse(msg rocket.Message) {
 }
 
 func OpenAIResponse(rocketmsg rocket.Message, oa *openai.OpenAI, hist *History) error {
+	assistanceId := oa.AssistantID
+	assistant, err := oa.GetAssistantByID(assistanceId)
 	msg := openai.Message{
 		Role:    "user",
 		Content: rocketmsg.GetNotAddressedText(),

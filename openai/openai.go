@@ -4,10 +4,11 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/mimrock/rocketchat_openai_bot/config"
 	"net/http"
 	"net/url"
 	"strings"
+
+	"Bartender2/config"
 )
 
 //var ErrorContextLengthExceeded = errors.New("context length exceeded")
@@ -32,10 +33,18 @@ func (e *ErrorContextLengthExceeded) Is(tgt error) bool {
 	return true
 }
 
+// Struct to capture the assistant retrieval response
+type AssistantDetails struct {
+	ID     string `json:"id"`
+	Name   string `json:"name"`
+	Status string `json:"status"`
+	Model  string `json:"model"`
+}
 type OpenAI struct {
 	HostName           string
 	CompletionEndpoint string
 	ModerationEndpoint string
+	AssistanceEndpoint string
 	ApiToken           string
 	PrePrompt          string
 	Model              string
@@ -43,6 +52,7 @@ type OpenAI struct {
 	OutputModeration   bool
 	SendUserId         bool
 	ModelParams        config.ModelParams
+	AssistantID        string
 }
 
 type HTTPError struct {
@@ -60,11 +70,13 @@ func NewFromConfig(config *config.Config) *OpenAI {
 		Model:              config.OpenAI.Model,
 		ModerationEndpoint: config.OpenAI.ModerationEndpoint,
 		CompletionEndpoint: config.OpenAI.CompletionEndpoint,
+		AssistanceEndpoint: config.OpenAI.AssistanceEndpoint,
 		InputModeration:    config.OpenAI.InputModeration,
 		OutputModeration:   config.OpenAI.OutputModeration,
 		SendUserId:         config.OpenAI.SendUserId,
 
 		ModelParams: config.OpenAI.ModelParams,
+		AssistantID: config.OpenAI.AssistantID,
 	}
 	return &oa
 }
@@ -158,6 +170,47 @@ func (o *OpenAI) request(url string, request interface{}, oaResponse interface{}
 	return nil
 }
 
+// Reusable request function for POST and GET
+func (o *OpenAI) requestAPI(method, url string, request interface{}, oaResponse interface{}) error {
+	var req *http.Request
+	var err error
+
+	if request != nil {
+		data, err := json.Marshal(request)
+		if err != nil {
+			return fmt.Errorf("cannot marshal request body: %w", err)
+		}
+		req, err = http.NewRequest(method, url, bytes.NewBuffer(data))
+	} else {
+		req, err = http.NewRequest(method, url, nil)
+	}
+
+	if err != nil {
+		return fmt.Errorf("cannot create new request: %w", err)
+	}
+
+	req.Header.Set("Content-Type", "application/json; charset=UTF-8")
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", o.ApiToken))
+	req.Header.Set("OpenAI-Beta", "assistants=v2")
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return fmt.Errorf("cannot perform request: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != 200 {
+		return fmt.Errorf("received non-200 response: %d", resp.StatusCode)
+	}
+
+	err = json.NewDecoder(resp.Body).Decode(oaResponse)
+	if err != nil {
+		return fmt.Errorf("cannot parse response body: %w", err)
+	}
+
+	return nil
+}
+
 func (o *OpenAI) NewCompletionRequest(messages []Message, user string) *CompletionRequest {
 	r := &CompletionRequest{
 		Model:            o.Model,
@@ -172,7 +225,7 @@ func (o *OpenAI) NewCompletionRequest(messages []Message, user string) *Completi
 	if len(user) > 0 {
 		r.User = &user
 	}
-	
+
 	return r
 }
 
@@ -187,4 +240,41 @@ func parseError(resp *http.Response, oaResponse interface{}) error {
 	}
 
 	return fmt.Errorf("Non-OK status code: %d", resp.StatusCode)
+}
+
+func (o *OpenAI) AssistanceURL() (string, error) {
+	if o.AssistantID != "" {
+		// URL for accessing a specific assistant by its ID
+		url, err := url.JoinPath("https://", o.HostName, o.AssistanceEndpoint, o.AssistantID)
+		if err != nil {
+			return "", fmt.Errorf("failed to build Assistance URL with ID: %w", err)
+		}
+		return url, nil
+	}
+
+	// URL for creating a new assistant (no assistant ID needed)
+	url, err := url.JoinPath("https://", o.HostName, o.AssistanceEndpoint)
+	if err != nil {
+		return "", fmt.Errorf("failed to build Assistance URL: %w", err)
+	}
+	return url, nil
+}
+
+// Function to retrieve an assistant by ID
+func (o *OpenAI) GetAssistantByID(assistantID string) (*AssistantDetails, error) {
+	url, err := o.AssistanceURL()
+	if err != nil {
+		return nil, fmt.Errorf("cannot assemble endpoint url: %w", err)
+	}
+
+	// Initialize the response object
+	var response AssistantDetails
+
+	// Make the GET request
+	err = o.requestAPI("GET", url, nil, &response)
+	if err != nil {
+		return nil, fmt.Errorf("error retrieving assistant: %w", err)
+	}
+
+	return &response, nil
 }
