@@ -62,7 +62,7 @@ func OpenAIResponse(rocketmsg rocket.Message, oa *openai.OpenAI, hist *History) 
 	runStatus, err := oa.WaitForRunCompletion(thread.ThreadID, runResp.RunID)
 	log.WithField("message", "Run status").Debug(runStatus.Status)
 	messagesResp, err := oa.GetMessages(thread.ThreadID)
-	log.WithField("message", "Length of messages").Debug(len(messagesResp.Messages))
+	log.WithField("message", "Length of messages").Debug(messagesResp)
 	rocketmsg.SetIsTyping(true)
 	defer func() {
 		rocketmsg.SetIsTyping(false)
