@@ -33,6 +33,11 @@ func DemoResponse(msg rocket.Message) {
 func OpenAIResponse(rocketmsg rocket.Message, oa *openai.OpenAI, hist *History) error {
 	assistanceId := oa.AssistantID
 	assistant, err := oa.GetAssistantByID(assistanceId)
+	if err != nil {
+		log.Fatalf("Error retrieving assistant: %v", err)
+	}
+
+	log.WithField("message", "Before Connection").Debug(assistant.Name)
 	msg := openai.Message{
 		Role:    "user",
 		Content: rocketmsg.GetNotAddressedText(),
