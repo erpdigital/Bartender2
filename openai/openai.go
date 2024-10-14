@@ -378,11 +378,6 @@ func (o *OpenAI) GetMessages(threadID string) (*MessageListResponse, error) {
 		return nil, fmt.Errorf("an error occurred while fetching the messages: %w", err)
 	}
 
-	// Check for any API-specific errors
-	if mResp.Error.Message != "" {
-		return nil, fmt.Errorf("%s: %s", mResp.Error.Code, mResp.Error.Message)
-	}
-
 	return &mResp, nil
 }
 func (o *OpenAI) RetrieveRun(threadID, runID string) (*RunResponse, error) {
