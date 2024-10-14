@@ -96,10 +96,6 @@ func OpenAIResponse(rocketmsg rocket.Message, oa *openai.OpenAI, hist *History) 
 		}
 	}
 
-	if err != nil {
-		log.Fatalf("Error fetching messages: %v", err)
-	}
-
 	rocketmsg.SetIsTyping(true)
 	defer func() {
 		rocketmsg.SetIsTyping(false)
