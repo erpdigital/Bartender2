@@ -58,16 +58,46 @@ func OpenAIResponse(rocketmsg rocket.Message, oa *openai.OpenAI, hist *History) 
 		log.Fatalf("Error Creating RunID: %v", err)
 	}
 	log.WithField("message", "Create Run").Debug(runResp.RunID)
-	messagesResp, err := oa.GetMessages(thread.ThreadID)
+	done := false
+
+	for !done {
+		// Retrieve the run status
+		messagesResp, err := oa.GetMessages(thread.ThreadID)
+		if err != nil {
+			log.Fatalf("Error fetching messages: %v", err)
+		}
+
+		// Handle different statuses
+		switch messagesResp.Status {
+		case "in_progress", "queued":
+			// Wait for a few seconds before checking again
+			time.Sleep(5 * time.Second)
+
+		case "completed":
+			done = true
+			//return messagesResp, nil  // Return the completed run with messages
+			// Print out the messages
+			for _, message := range messagesResp.Messages {
+				log.WithField("message", "Messages").Debug(message.Content)
+			}
+			if err != nil {
+				log.Fatalf("Error creating run: %v", err)
+			}
+		case "failed":
+			log.Fatalf("Error fetching messages: %v", err)
+
+		case "cancelled", "cancelling", "expired":
+			log.Fatalf("Error fetching messages: %v", err)
+		case "requires_action":
+			log.Fatalf("Error fetching messages: %v", err)
+
+		default:
+			log.Fatalf("Error fetching messages: %v", err)
+		}
+	}
+
 	if err != nil {
 		log.Fatalf("Error fetching messages: %v", err)
-	}
-	// Print out the messages
-	for _, message := range messagesResp.Messages {
-		log.Printf("Role: %s, Content: %s", message.Role, message.Content)
-	}
-	if err != nil {
-		log.Fatalf("Error creating run: %v", err)
 	}
 
 	rocketmsg.SetIsTyping(true)
