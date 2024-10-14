@@ -34,14 +34,29 @@ type Message struct {
 	Role    string `json:"role"`
 	Content string `json:"content"`
 }
+type MessageContent struct {
+	Type string `json:"type"`
+	Text struct {
+		Value       string     `json:"value"`
+		Annotations []struct{} `json:"annotations"` // Assuming annotations are present but can be ignored for now
+	} `json:"text"`
+}
+type MessageRun struct {
+	ID          string           `json:"id"`
+	Role        string           `json:"role"`
+	AssistantID *string          `json:"assistant_id,omitempty"` // AssistantID can be null
+	Content     []MessageContent `json:"content"`                // Content is an array
+	CreatedAt   int64            `json:"created_at"`
+	ThreadID    string           `json:"thread_id"`
+	RunID       *string          `json:"run_id,omitempty"` // RunID can be null
+}
 type MessageListResponse struct {
-	ID       string    `json:"id"`
-	Status   string    `json:"status"`
-	Messages []Message `json:"messages"`
-	Error    struct {
-		Message string `json:"message"`
-		Code    string `json:"code"`
-	} `json:"error"`
+	Messages []Message `json:"data"`
+
+	Object  string  `json:"object"`
+	FirstID *string `json:"first_id"`
+	LastID  *string `json:"last_id"`
+	HasMore bool    `json:"has_more"`
 }
 type Choice struct {
 	Index        int     `json:"index"`

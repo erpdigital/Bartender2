@@ -1,14 +1,14 @@
 package openai
 
 import (
+	"Bartender2/config"
 	"bytes"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
 	"strings"
-
-	"Bartender2/config"
+	"time"
 )
 
 //var ErrorContextLengthExceeded = errors.New("context length exceeded")
@@ -384,4 +384,60 @@ func (o *OpenAI) GetMessages(threadID string) (*MessageListResponse, error) {
 	}
 
 	return &mResp, nil
+}
+func (o *OpenAI) RetrieveRun(threadID, runID string) (*RunResponse, error) {
+	// Define the URL for retrieving the run status
+	url := fmt.Sprintf("https://api.openai.com/v1/threads/%s/runs/%s", threadID, runID)
+
+	// Initialize the response
+	var rResp RunResponse
+
+	// Send the GET request to retrieve the run status
+	err := o.requestAPI("GET", url, nil, &rResp)
+	if err != nil {
+		return nil, fmt.Errorf("an error occurred while retrieving the run: %w", err)
+	}
+
+	// Check for any API-specific errors
+	if rResp.Error.Message != "" {
+		return nil, fmt.Errorf("%s: %s", rResp.Error.Code, rResp.Error.Message)
+	}
+
+	return &rResp, nil
+}
+func (o *OpenAI) WaitForRunCompletion(threadID, runID string) (*RunResponse, error) {
+	done := false
+
+	for !done {
+		// Retrieve the run status
+		resp, err := o.RetrieveRun(threadID, runID)
+		if err != nil {
+			return nil, fmt.Errorf("error getting run: %v", err)
+		}
+
+		// Handle different statuses
+		switch resp.Status {
+		case "in_progress", "queued":
+			// Wait for a few seconds before checking again
+			time.Sleep(5 * time.Second)
+
+		case "completed":
+			done = true
+			return resp, nil // Return the completed run with messages
+
+		case "failed":
+			return nil, fmt.Errorf("run failed: %v", resp.Error.Message)
+
+		case "cancelled", "cancelling", "expired":
+			return nil, fmt.Errorf("run was cancelled or expired")
+
+		case "requires_action":
+			return nil, fmt.Errorf("run requires action")
+
+		default:
+			return nil, fmt.Errorf("unexpected run status: %s", resp.Status)
+		}
+	}
+
+	return nil, fmt.Errorf("run did not complete")
 }
