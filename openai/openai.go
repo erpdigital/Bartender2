@@ -353,7 +353,7 @@ func (o *OpenAI) CreateRun(threadID string) (*RunResponse, error) {
 	var rResp RunResponse
 
 	// Send the POST request with the run details
-	err := o.request(url, rReq, &rResp)
+	err := o.requestAPI("POST", url, rReq, &rResp)
 	if err != nil {
 		return nil, fmt.Errorf("an error occurred while creating the run: %w", err)
 	}
@@ -366,22 +366,22 @@ func (o *OpenAI) CreateRun(threadID string) (*RunResponse, error) {
 	return &rResp, nil
 }
 func (o *OpenAI) GetMessages(threadID string) (*MessageListResponse, error) {
-    // Define the URL for fetching messages from the thread
-    url := fmt.Sprintf("https://api.openai.com/v1/threads/%s/messages", threadID)
+	// Define the URL for fetching messages from the thread
+	url := fmt.Sprintf("https://api.openai.com/v1/threads/%s/messages", threadID)
 
-    // Initialize the response
-    var mResp MessageListResponse
+	// Initialize the response
+	var mResp MessageListResponse
 
-    // Send the GET request (note that request body is nil for GET)
-    err := o.request(url, nil, &mResp)
-    if err != nil {
-        return nil, fmt.Errorf("an error occurred while fetching the messages: %w", err)
-    }
+	// Send the GET request (note that request body is nil for GET)
+	err := o.request(url, nil, &mResp)
+	if err != nil {
+		return nil, fmt.Errorf("an error occurred while fetching the messages: %w", err)
+	}
 
-    // Check for any API-specific errors
-    if mResp.Error.Message != "" {
-        return nil, fmt.Errorf("%s: %s", mResp.Error.Code, mResp.Error.Message)
-    }
+	// Check for any API-specific errors
+	if mResp.Error.Message != "" {
+		return nil, fmt.Errorf("%s: %s", mResp.Error.Code, mResp.Error.Message)
+	}
 
-    return &mResp, nil
+	return &mResp, nil
 }
