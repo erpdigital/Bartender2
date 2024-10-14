@@ -39,6 +39,9 @@ func OpenAIResponse(rocketmsg rocket.Message, oa *openai.OpenAI, hist *History) 
 
 	log.WithField("message", "Assistent model").Debug(assistant.Model)
 	thread, err := oa.CreateThread()
+	if err != nil {
+		log.Fatalf("Error retrieving Thread: %v", err)
+	}
 	log.WithField("message", "Thread ID").Debug(thread.ThreadID)
 	msg := openai.Message{
 		Role:    "user",
