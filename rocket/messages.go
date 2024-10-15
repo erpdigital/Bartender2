@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"strings"
 	"time"
+
+	log "github.com/sirupsen/logrus"
 )
 
 type Message struct {
@@ -54,7 +56,7 @@ func (rock *RocketCon) handleMessageObject(obj map[string]interface{}) Message {
 	msg.RoomId = obj["rid"].(string)
 	msg.UserId = obj["u"].(map[string]interface{})["_id"].(string)
 	msg.UserName = obj["u"].(map[string]interface{})["username"].(string)
-		// Check if the bot name is included in the message text
+	// Check if the bot name is included in the message text
 	if !strings.Contains(strings.ToLower(msg.Text), fmt.Sprintf("@%s", strings.ToLower(rock.UserName))) {
 		// Prepend "@rocket.cat" to the message text if the bot name is not present
 		//msg.Text = "@rocket.cat " + msg.Text
@@ -224,6 +226,8 @@ func (msg *Message) SetIsTyping(typing bool) error {
 			typing,
 		},
 	}
+	log.WithField("message", "Room ID").Debug(msg.RoomId)
+	log.WithField("message", "Displayname").Debug(msg.rocketCon.DisplayName)
 	_, err := msg.rocketCon.runMethod(obj)
 	return err
 }
