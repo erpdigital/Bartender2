@@ -63,9 +63,9 @@ func OpenAIResponse(rocketmsg rocket.Message, oa *openai.OpenAI, hist *History) 
 	messagesResp, err := oa.GetMessages(thread.ThreadID)
 	log.WithField("message", "Length of messages").Debug(messagesResp)
 	rocketmsg.SetIsTyping(true)
-	defer func() {
-		rocketmsg.SetIsTyping(false)
-	}()
+	//defer func() {
+	//	rocketmsg.SetIsTyping(false)
+	//}()
 
 	//place := rocketmsg.RoomName
 	var response string
