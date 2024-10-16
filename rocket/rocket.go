@@ -216,7 +216,7 @@ func (rock *RocketCon) run() {
 			log.WithError(err).WithField("ws", ws).Warn("Cannot read websocket.")
 			break
 		}
-		log.WithField("message", "Method").Debug("2")
+
 		var pack map[string]interface{}
 		err = json.Unmarshal(raw, &pack)
 		if err != nil {
@@ -509,6 +509,8 @@ func (rock *RocketCon) GetMessage() (Message, error) {
 
 func (rock *RocketCon) GetNewMessage() (Message, error) {
 	var msg Message
+	log.WithField("Method", "GetNewMessage").Debug(rock.newMessages)
+	log.WithField("Method", "GetNewMessageQUIT").Debug(rock.quit)
 	select {
 	case msg := <-rock.newMessages:
 		return msg, nil
