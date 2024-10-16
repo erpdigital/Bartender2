@@ -114,18 +114,8 @@ func (rock *RocketCon) init() error {
 	rock.quit = make(chan struct{}, 0)
 	rock.channels = make(map[string]string)
 
-	go func() {
-		for {
-			// Use defer to recover from any panic in the run method
-			defer func() {
-				if r := recover(); r != nil {
-					log.WithField("error", r).Error("Recovered from panic in run method")
-				}
-			}()
-			rock.run()                  // Call the run method
-			time.Sleep(2 * time.Second) // Optional: delay before restarting
-		}
-	}()
+	go rock.run()
+
 	log.WithField("message", "afterRun").Debug("hello")
 	// Send Init Messages
 	rock.connect()
@@ -221,7 +211,7 @@ func (rock *RocketCon) run() {
 	for {
 		_, raw, err := ws.ReadMessage()
 		ws.SetReadDeadline(time.Now().Add(timeout))
-
+		log.WithField("message", "ReadMessage").Debug(raw)
 		if err != nil {
 			log.WithError(err).WithField("ws", ws).Warn("Cannot read websocket.")
 			break
@@ -296,7 +286,9 @@ func (rock *RocketCon) run() {
 						log.WithField("message", "Method").Debug("15")
 						message := rock.handleMessageObject(val.(map[string]interface{}))
 						log.WithField("message", "Method").Debug("16")
+
 						if message.IsNew && !message.IsMe {
+							log.WithField("message", "Stream").Debug("Potential trouble")
 							select {
 							case rock.newMessages <- message:
 								break
