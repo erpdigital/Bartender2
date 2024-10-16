@@ -286,7 +286,7 @@ func (rock *RocketCon) run() {
 						log.WithField("message", "Method").Debug("15")
 						message := rock.handleMessageObject(val.(map[string]interface{}))
 						log.WithField("message", "Method").Debug("16")
-
+						log.WithField("Method", "message").Debug(message)
 						if message.IsNew && !message.IsMe {
 							log.WithField("message", "Stream").Debug("Potential trouble")
 							select {
