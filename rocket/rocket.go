@@ -224,7 +224,7 @@ func (rock *RocketCon) run() {
 			continue
 		}
 		log.WithField("message", "ReadMessage").Debug(pack["msg"])
-		log.WithField("message", "Method").Debug("3")
+
 		if msg, ok := pack["msg"]; ok {
 			switch msg {
 			case "connected":
@@ -260,13 +260,12 @@ func (rock *RocketCon) run() {
 				break
 			case "changed":
 				log.WithField("message", "Method").Debug("11")
-				log.WithField("message", "Method").Debug(pack)
-				log.WithField("message", "Method").Debug(pack["fields"])
+
 				// Check if it exists and is not nil
 
 				obj := pack["fields"].(map[string]interface{})["args"].([]interface{})
 				log.WithField("message", "Method").Debug("12")
-				log.WithField("message", "Method").Debug(pack["collection"])
+
 				switch pack["collection"].(string) {
 				case "stream-notify-user":
 					log.WithField("message", "Method").Debug("13")
@@ -307,7 +306,6 @@ func (rock *RocketCon) run() {
 			case "ready":
 				break
 			case "ping":
-				log.WithField("message", "Method").Debug("17")
 				pong := map[string]string{
 					"msg": "pong",
 				}
