@@ -29,43 +29,39 @@ func DemoResponse(msg rocket.Message) {
 	msg.React(":grinning:")
 }
 
-func OpenAIResponse(rocketmsg rocket.Message, oa *openai.OpenAI, hist *History) error {
-	assistanceId := oa.AssistantID
-	assistant, err := oa.GetAssistantByID(assistanceId)
-	if err != nil {
-		log.Fatalf("Error retrieving assistant: %v", err)
-	}
+func OpenAIResponse(rocketmsg rocket.Message, oa *openai.OpenAI, hist *History, threadID string) error {
+	//assistanceId := oa.AssistantID
+	//assistant, err := oa.GetAssistantByID(assistanceId)
+	//if err != nil {
+	//	log.Fatalf("Error retrieving assistant: %v", err)
+	//}
 
-	log.WithField("message", "Assistent model").Debug(assistant.Model)
-	thread, err := oa.CreateThread()
-	if err != nil {
-		log.Fatalf("Error retrieving Thread: %v", err)
-	}
-	log.WithField("message", "Thread ID").Debug(thread.ThreadID)
+	//log.WithField("message", "Assistent model").Debug(assistant.Model)
+	
 	msg := openai.Message{
 		Role:    "user",
 		Content: rocketmsg.GetNotAddressedText(),
 	}
-	threadmessage, err := oa.AddMessageToThread(thread.ThreadID, msg)
+	threadmessage, err := oa.AddMessageToThread(threadID, msg)
 	if err != nil {
 		log.Fatalf("Error Adding Message to Thread: %v", err)
 	}
 	log.WithField("message", "Thread Message").Debug(threadmessage.ID)
 	// Create the run in the thread using the PrePrompt and AssistantID from the struct
-	runResp, err := oa.CreateRun(thread.ThreadID)
+	runResp, err := oa.CreateRun(threadID)
 	if err != nil {
 		log.Fatalf("Error Creating RunID: %v", err)
 	}
 	log.WithField("message", "Create Run").Debug(runResp.RunID)
 
-	runStatus, err := oa.WaitForRunCompletion(thread.ThreadID, runResp.RunID)
+	runStatus, err := oa.WaitForRunCompletion(threadID, runResp.RunID)
 	log.WithField("message", "Run status").Debug(runStatus.Status)
-	messagesResp, err := oa.GetMessages(thread.ThreadID)
+	messagesResp, err := oa.GetMessages(threadID)
 	log.WithField("message", "Length of messages").Debug(messagesResp)
 	rocketmsg.SetIsTyping(true)
-	//defer func() {
-	//	rocketmsg.SetIsTyping(false)
-	//}()
+	defer func() {
+		rocketmsg.SetIsTyping(false)
+	}()
 
 	//place := rocketmsg.RoomName
 	var response string

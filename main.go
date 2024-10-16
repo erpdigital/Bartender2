@@ -53,7 +53,11 @@ func main() {
 
 	//history object
 	hist := NewHistoryFromConfig(cfg)
-
+	thread, err := oa.CreateThread()
+	if err != nil {
+		log.Fatalf("Error retrieving Thread: %v", err)
+	}
+	log.WithField("message", "Thread ID").Debug(thread.ThreadID)
 	for {
 		log.WithField("message", "Before").Debug("Get messages")
 		// Wait for a new message to come in
@@ -70,7 +74,7 @@ func main() {
 		if msg.AmIPinged || msg.IsDirect {
 			log.WithField("message", "MAIN").Debug("I am in MAIN")
 			log.WithField("message", msg).Debug("Incoming message for the bot.")
-			err = OpenAIResponse(msg, oa, hist)
+			err = OpenAIResponse(msg, oa, hist,thread.id)
 			if err != nil {
 				log.WithError(err).Error("OpenAI request failed.")
 				_, err = msg.Reply(fmt.Sprintf("@%s :x: Sorry, something went wrong while processing your request. This could be due to a configuration issue, a problem with the OpenAI API, or a bug in the system. Please check your configuration settings or try again later. More details can be found in the logs. :x:", msg.UserName))
