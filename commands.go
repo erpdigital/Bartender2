@@ -29,7 +29,7 @@ func DemoResponse(msg rocket.Message) {
 	msg.React(":grinning:")
 }
 
-func OpenAIResponse(rocketmsg rocket.Message, oa *openai.OpenAI, hist *History, threadID string) error {
+func OpenAIResponse(rocketmsg rocket.Message, oa *openai.OpenAI, hist *History) error {
 	//assistanceId := oa.AssistantID
 	//assistant, err := oa.GetAssistantByID(assistanceId)
 	//if err != nil {
@@ -37,7 +37,12 @@ func OpenAIResponse(rocketmsg rocket.Message, oa *openai.OpenAI, hist *History, 
 	//}
 
 	//log.WithField("message", "Assistent model").Debug(assistant.Model)
-	
+	thread, err := oa.CreateThread()
+	if err != nil {
+		log.Fatalf("Error retrieving Thread: %v", err)
+	}
+	log.WithField("message", "Thread ID").Debug(thread.ThreadID)
+	threadID := thread.ThreadID
 	msg := openai.Message{
 		Role:    "user",
 		Content: rocketmsg.GetNotAddressedText(),
