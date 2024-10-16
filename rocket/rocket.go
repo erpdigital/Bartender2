@@ -211,7 +211,7 @@ func (rock *RocketCon) run() {
 	for {
 		_, raw, err := ws.ReadMessage()
 		ws.SetReadDeadline(time.Now().Add(timeout))
-		log.WithField("message", "ReadMessage").Debug(raw)
+
 		if err != nil {
 			log.WithError(err).WithField("ws", ws).Warn("Cannot read websocket.")
 			break
@@ -223,6 +223,7 @@ func (rock *RocketCon) run() {
 			log.WithError(err).WithField("raw", raw).Warn("Cannot unmarshal data read from websocket.")
 			continue
 		}
+		log.WithField("message", "ReadMessage").Debug(pack["msg"])
 		log.WithField("message", "Method").Debug("3")
 		if msg, ok := pack["msg"]; ok {
 			switch msg {
