@@ -29,24 +29,41 @@ func DemoResponse(msg rocket.Message) {
 	msg.React(":grinning:")
 }
 
+var roomToThreadMap = make(map[string]string)
+
 func OpenAIResponse(rocketmsg rocket.Message, oa *openai.OpenAI, hist *History) error {
 	//assistanceId := oa.AssistantID
 	//assistant, err := oa.GetAssistantByID(assistanceId)
 	//if err != nil {
 	//	log.Fatalf("Error retrieving assistant: %v", err)
 	//}
-
+	place := rocketmsg.RoomName
+	var threadID string
 	//log.WithField("message", "Assistent model").Debug(assistant.Model)
-	thread, err := oa.CreateThread()
-	if err != nil {
-		log.Fatalf("Error retrieving Thread: %v", err)
+	if existingThreadID, found := roomToThreadMap[place]; found {
+		// If thread exists, retrieve the thread ID
+		threadID = existingThreadID
+		log.WithField("message", "Reusing existing thread").Debug(threadID)
+	} else {
+		// If no thread exists for this room, create a new one
+		thread, err := oa.CreateThread()
+		if err != nil {
+			log.Fatalf("Error creating Thread: %v", err)
+		}
+		threadID = thread.ThreadID
+		log.WithField("message", "New Thread ID").Debug(threadID)
+
+		// Store the new thread ID in the map for future use
+		roomToThreadMap[place] = threadID
+		log.WithField("room", place).Debug("Storing new thread ID in map")
 	}
-	log.WithField("message", "Thread ID").Debug(thread.ThreadID)
-	threadID := thread.ThreadID
+	log.WithField("message", "Thread ID").Debug(threadID)
+
 	msg := openai.Message{
 		Role:    "user",
 		Content: rocketmsg.GetNotAddressedText(),
 	}
+
 	threadmessage, err := oa.AddMessageToThread(threadID, msg)
 	if err != nil {
 		log.Fatalf("Error Adding Message to Thread: %v", err)
@@ -68,7 +85,6 @@ func OpenAIResponse(rocketmsg rocket.Message, oa *openai.OpenAI, hist *History) 
 		rocketmsg.SetIsTyping(false)
 	}()
 
-	//place := rocketmsg.RoomName
 	var response string
 	response += messagesResp.Messages[0].Content[0].Text.Value
 	log.WithField("Received", "Messages").Debug(messagesResp.Messages[0].Content[0].Text.Value)
