@@ -219,6 +219,7 @@ func useAssistantAPI(rocketmsg rocket.Message, oa *openai.OpenAI, hist *History)
 	}
 
 	runStatus, err := oa.WaitForRunCompletion(threadID, runResp.RunID)
+	log.WithField("message", "Length of messages").Debug(runStatus.RunID)
 	if err != nil {
 		return fmt.Errorf("error waiting for run completion: %w", err)
 	}
