@@ -345,8 +345,8 @@ func (o *OpenAI) CreateRun(threadID string) (*RunResponse, error) {
 
 	// Use o.AssistantID and o.PrePrompt in the request
 	rReq := &RunRequest{
-		AssistantID:  o.AssistantID, // Use o.AssistantID here
-		Instructions: o.PrePrompt,   // Use o.PrePrompt here
+		AssistantID:  o.AssistantID // Use o.AssistantID here
+		//Instructions: o.PrePrompt,   // Use o.PrePrompt here
 	}
 
 	// Initialize the response
